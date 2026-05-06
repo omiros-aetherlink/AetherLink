@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AetherLink</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
+            background: #f2f9fe;
+            color: #0a232f;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ========== ANIMATED DOT BACKGROUND ========== */
+        .dot-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+            background: radial-gradient(circle at 10% 30%, rgba(180, 210, 240, 0.25) 0%, rgba(210, 225, 245, 0.1) 100%);
+        }
+
+        .dot {
+            position: absolute;
+            background: rgba(55, 115, 175, 0.35);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(80, 130, 200, 0.3);
+            animation: floatDot 6s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes floatDot {
+            0% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-35px) translateX(12px);
+                opacity: 0.9;
+            }
+        }
+
+        /* ========== NAVIGATION BAR ========== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(14px);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            border-bottom: 2px solid #8eb6dd;
+            box-shadow: 0 6px 22px rgba(30, 60, 90, 0.08);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #1f4871;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.6, 1.1);
+            cursor: pointer;
+            padding: 0.5rem 1.1rem;
+            border-radius: 60px;
+            letter-spacing: 0.2px;
+            display: inline-block;
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 145, 210, 0.35), transparent);
+            transition: left 0.6s ease;
+            pointer-events: none;
+            border-radius: 60px;
+        }
+
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+
+        .nav-links a:hover {
+            transform: scale(1.08) translateY(-5px);
+            background: white;
+            color: #0a3757;
+            box-shadow: 0 14px 22px -8px rgba(50, 95, 150, 0.35);
+            border: 1px solid #7aa2d0;
+            animation: gentleFloatNav 1.2s infinite ease-in-out;
+        }
+
+        @keyframes gentleFloatNav {
+            0% { transform: translateY(0px) scale(1.08); }
+            50% { transform: translateY(-5px) scale(1.08); }
+            100% { transform: translateY(0px) scale(1.08); }
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-top: 70px;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 85px 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #134f7f, #2b87b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 5px rgba(0, 30, 50, 0.05);
+        }
+
+        /* Home Section */
+        .home-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            padding: 4rem 3rem;
+            border-radius: 70px;
+            box-shadow: 0 25px 45px rgba(60, 80, 120, 0.12);
+            border: 1px solid rgba(95, 145, 210, 0.5);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .home-content h1 {
+            font-size: 3.8rem;
+            margin-bottom: 1.5rem;
+            color: #0e426b;
+            font-weight: 800;
+        }
+
+        .home-content p.hero-text {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 1rem auto;
+            color: #1d4059;
+            line-height: 1.7;
+            font-weight: 500;
+        }
+
+        .home-content p.hero-subtext {
+            font-size: 1.1rem;
+            max-width: 750px;
+            margin: 1rem auto 2rem auto;
+            color: #244d6e;
+            line-height: 1.6;
+        }
+
+        .stats-badge {
+            background: #d9e8f5;
+            display: inline-block;
+            padding: 0.6rem 2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            font-weight: 700;
+            color: #0a3757;
+            font-size: 1.1rem;
+            border: 1px solid #b1c9e2;
+        }
+
+        /* Skills Cards */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .skill-card {
+            background: white;
+            border-radius: 40px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(40, 70, 100, 0.08);
+            transition: all 0.35s ease;
+            border: 1px solid #b1c9e2;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 28px 40px rgba(35, 85, 125, 0.2);
+            border-color: #458bc4;
+            background: #ffffff;
+        }
+
+        .skill-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-card h3 {
+            color: #0f446c;
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .skill-card p {
+            color: #244d6e;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        /* Group Picture */
+        .group-pic-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto 3.5rem auto;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(35, 85, 125, 0.15);
+            border: 6px solid #ffffff;
+            position: relative;
+        }
+
+        .group-pic-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .group-pic-container:hover img {
+            transform: scale(1.04);
+        }
+
+        /* Team Cards */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 48px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #c2d4e8;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            border-color: #4a92cf;
+            box-shadow: 0 25px 35px -10px rgba(60, 100, 150, 0.25);
+            background: #fefffe;
+        }
+
+        .member-avatar {
+            font-size: 4.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .member-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+            color: #13486f;
+        }
+
+        .member-role {
+            font-size: 1rem;
+            color: #356587;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .member-quote {
+            font-style: italic;
+            color: #1a3e5c;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .member-bio {
+            color: #244d6e;
+            font-weight: 500;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-top: auto;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(40, 70, 100, 0.08);
+            transition: all 0.35s ease;
+            border: 1px solid #b1c9e2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 28px 40px rgba(35, 85, 125, 0.2);
+            border-color: #458bc4;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-bottom: 2px solid #e3eff9;
+        }
+
+        .project-info {
+            padding: 2rem;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .project-info h3 {
+            color: #0f446c;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            font-size: 1.4rem;
+        }
+
+        .project-info p {
+            color: #244d6e;
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* Q&A section */
+        .qa-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .qa-item {
+            background: white;
+            border-radius: 32px;
+            margin-bottom: 1.3rem;
+            overflow: hidden;
+            border: 1px solid #b7cfe6;
+            box-shadow: 0 8px 18px rgba(35, 70, 100, 0.05);
+        }
+
+        .qa-question {
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+            background: #ffffff;
+            color: #0b3f67;
+            transition: background 0.2s;
+        }
+
+        .qa-question:hover {
+            background: #e3eff9;
+        }
+
+        .qa-answer {
+            padding: 0 2rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            color: #2a4a62;
+            line-height: 1.6;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        .qa-item.active .qa-answer {
+            padding: 0 2rem 1.6rem 2rem;
+            max-height: 400px;
+            border-top: 1px solid #abc2de;
+            margin-top: 0.5rem;
+        }
+
+        /* BUTTONS */
+        .contact-container {
+            text-align: center;
+            background: white;
+            padding: 4rem 2rem;
+            border-radius: 60px;
+            box-shadow: 0 20px 40px rgba(35, 85, 125, 0.1);
+            border: 1px solid #c2d4e8;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .contact-intro {
+            font-size: 1.3rem;
+            color: #23496b;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .contact-subtext {
+            color: #356587;
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .contact-btn {
+            padding: 1rem 2.4rem;
+            background: linear-gradient(115deg, #ffffff, #f3f8fe);
+            border: 1.8px solid #2b77bb;
+            border-radius: 80px;
+            color: #0b416b;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.6, 1.1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 5px 15px rgba(50, 90, 140, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 140, 215, 0.5), transparent);
+            transition: left 0.65s ease;
+            pointer-events: none;
+        }
+
+        .contact-btn:hover::before {
+            left: 100%;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.09) translateY(-6px);
+            background: white;
+            border-color: #1f64aa;
+            color: #054d31;
+            box-shadow: 0 20px 30px -8px rgba(45, 90, 150, 0.45);
+            animation: gentleFloatContact 1.2s infinite ease-in-out;
+        }
+
+        @keyframes gentleFloatContact {
+            0% { transform: translateY(0px) scale(1.09); }
+            50% { transform: translateY(-6px) scale(1.09); }
+            100% { transform: translateY(0px) scale(1.09); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: #e2ecf7;
+            color: #1b486e;
+            border-top: 2px solid #a8c0df;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 780px) {
+            .section-title { font-size: 2.4rem; }
+            .home-content h1 { font-size: 2.5rem; }
+            .nav-links { gap: 0.7rem; }
+            .nav-links a {
+                padding: 0.4rem 1rem;
+                font-size: 0.95rem;
+            }
+            section { padding: 90px 6%; }
+            .contact-btn { padding: 0.8rem 1.8rem; }
+            .team-grid, .projects-grid, .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dot-bg" id="dotBg"></div>
+
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a onclick="scrollToSection('home')" data-i18n="nav-home">🏠 Home</a></li>
+            <li><a onclick="scrollToSection('skills')" data-i18n="nav-skills">⚡ Skills</a></li>
+            <li><a onclick="scrollToSection('about')" data-i18n="nav-about">👥 About Us</a></li>
+            <li><a onclick="scrollToSection('projects')" data-i18n="nav-projects">📂 Projects</a></li>
+            <li><a onclick="scrollToSection('qa')" data-i18n="nav-qa">💬 Q&A</a></li>
+            <li><a onclick="scrollToSection('contact')" data-i18n="nav-contact">📞 Contact</a></li>
+            <li>
+                <button id="langToggle" style="background: #dae5f4; color: #0a3757; border: 1px solid #7aa2d0; padding: 0.4rem 1rem; border-radius: 60px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; font-family: inherit; font-size: 0.95rem;">AL / EN</button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <section id="home">
+            <div class="home-content">
+                <h1 data-i18n="hero-title">🌐AetherLink. Connected by code, driven by Aether.</h1>
+                <p class="hero-text" data-i18n="hero-text">Creating intelligent conversational agents that help students learn about art, literature, history & and many more with our diverse AI ecosystems. Our chatbots blend vast knowledge with genuine empathy to create a seamless learning experience.</p>
+                <p class="hero-subtext" data-i18n="hero-subtext">We believe technology should empower education, not replace human connection. Whether it’s acting as a patient tutor, a creative brainstorming partner, or a reliable automated support system for a business, we architect chatbots that understand context, tone, and intent.</p>
+                <div class="stats-badge" data-i18n="hero-badge">🚀 10+ Custom Bots, 2 Seperate Ecosystems and more &nbsp;|&nbsp; 🎓 Happy Students & Users</div>
+            </div>
+        </section>
+
+        <!-- ADDED ECOSYSTEM SECTION HERE -->
+        <section id="free-ecosystem" style="min-height: auto; padding: 0 10% 4rem 10%;">
+            <div class="home-content" style="padding: 2.5rem 3rem; margin-top: -3rem; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,248,255,0.85));">
+                <h2 style="font-size: 2rem; color: #0e426b; font-weight: 800; margin-bottom: 0.8rem;" data-i18n="eco-title">🌟 Try Our Free Core Ecosystem</h2>
+                <p style="font-size: 1.1rem; color: #244d6e; margin-bottom: 1.8rem; font-weight: 500;" data-i18n="eco-text">Experience our free learning bots and discover what AetherLink can do for your educational journey today.</p>
+                <a href="https://omiros-aetherlink.github.io/AetherCore/" target="_blank" class="contact-btn" style="text-decoration: none;">
+                    <span data-i18n="eco-btn">🚀 Launch AetherCore</span>
+                </a>
+            </div>
+        </section>
+        <!-- END ADDED ECOSYSTEM SECTION -->
+
+        <section id="skills">
+            <h2 class="section-title" data-i18n="skills-title">🚀 Our Core Capabilities</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-icon">🧠</div>
+                    <h3 data-i18n="skill1-title">AI Development & Integration</h3>
+                    <p data-i18n="skill1-desc">We specialize in AI development, while building clean and seemless ecosystems, all to integrate AI into the users life as neatly as possible</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🌐</div>
+                    <h3 data-i18n="skill2-title">Web & Interface Design</h3>
+                    <p data-i18n="skill2-desc">From sleek HTML/CSS frameworks to dynamic React frontends, we ensure our chatbots are wrapped in beautiful interfaces that are effortless to embed anywhere while perfectly emmiting the same nostalgic aroma everyone craves from Frutiger Aero.</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">💬</div>
+                    <h3 data-i18n="skill3-title">Prompt Engineering</h3>
+                    <p data-i18n="skill3-desc">It's not just about what the bot says, but how it says it. We craft prompts that ensure robust conversational memory, adaptive tone, and highly empathetic yet accurate replies.</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">☁️</div>
+                    <h3 data-i18n="skill4-title">Up to date Development & Frequent Updates</h3>
+                    <p data-i18n="skill4-desc">Our team works day in and out to offer new updates and features, as well as up to date information and a clean environment, fixing issues and bugs almost instantly.</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🎨</div>
+                    <h3 data-i18n="skill5-title">UI / UX Optimization</h3>
+                    <p data-i18n="skill5-desc">We prioritize accessibility and user delight, ensuring that every chat bubble, button, and interaction feels intuitive for users of all technical backgrounds.</p>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon">🔐</div>
+                    <h3 data-i18n="skill6-title">Data Privacy & Safety</h3>
+                    <p data-i18n="skill6-desc">Security is key. We build with ethical AI guardrails and strict data protection protocols to keep user information safe.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2 class="section-title" data-i18n="about-title">👥 Meet The Creators</h2>
+            
+            <div class="group-pic-container">
+                <img src="group pic.jpg" alt="Our Team Creators">
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">👩‍💻</div>
+                    <div class="member-name">Alex</div>
+                    <div class="member-role" data-i18n="alex-role">Ecosystem Coder & Hardware Developer</div>
+                    <div class="member-quote" data-i18n="alex-quote">"Building AI for everyone."</div>
+                    <div class="member-bio" data-i18n="alex-bio">With a deep passion for technology, Alex oversees the core architecture of our ecosystems. He ensures that every Bot we develop is not only technologically advanced but fundamentally helpful, and accsesible to anyone no mattter their abilities which he makes possible with Nexo.</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">🧠</div>
+                    <div class="member-name">Marina</div>
+                    <div class="member-role" data-i18n="marina-role">Main Bot Programer & Website developer</div>
+                    <div class="member-quote" data-i18n="marina-quote">"Code meets presicion, pixel by pixel."</div>
+                    <div class="member-bio" data-i18n="marina-bio">Marina is the visionary behind our comlex bots. Bridging the gap between complex backend logic and user-friendly design, she meticulously crafts accessible and highly responsive web environments, ensuring our chatbots functions just as brilliant as they look.</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">🎨</div>
+                    <div class="member-name">Spiridhula</div>
+                    <div class="member-role" data-i18n="spiri-role">Graphics and UI designer</div>
+                    <div class="member-quote" data-i18n="spiri-quote">"Grapics that tell a story."</div>
+                    <div class="member-bio" data-i18n="spiri-bio">Spiridhula gives our bots their spark. By implementing sleek UI elements into each and every part of our project, she ensures that our Ecosystems appeal to Teachers, Students, Buisnesses and anyone else, while also keeping our brands Aero Identity alive and the center of each of our projects.</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">📊</div>
+                    <div class="member-name">Petrula</div>
+                    <div class="member-role" data-i18n="pet-role">Community and Promotion manager</div>
+                    <div class="member-quote" data-i18n="pet-quote">"Community & engagement magic."</div>
+                    <div class="member-bio" data-i18n="pet-bio">Products thrive when people love them, and Petrula makes sure our users are always pleased with the frequent updates she suggests. From gathering vital feedback regarding potential features to presenting our projects to judges with pure organisation and accuarcy, she makes sure our project is portrayed how it's meant to be, in its own style.</div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">📢</div>
+                    <div class="member-name">Iliana</div>
+                    <div class="member-role" data-i18n="ili-role">Digital Outreach & Social Media Manager</div>
+                    <div class="member-quote" data-i18n="ili-quote">"Reaching minds in up-to-date methods."</div>
+                    <div class="member-bio" data-i18n="ili-bio">Iliana is the engine driving our growth. Through targeted ad campaigns and smart social media strategy, she navigates the digital landscape to connect our smart chatbot solutions with the people that need them most, while actively bringing new engagement from different platforms, ultimately scaling our reach and maximizing our brand's overall long-term presence.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2 class="section-title" data-i18n="proj-title">📂 Featured Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <img src="project1.jpg" alt="Project 1: AetherLink Core Ecosystem" class="project-img">
+                    <div class="project-info">
+                        <h3 data-i18n="proj1-title">AetherLink Ecosystem</h3>
+                        <p data-i18n="proj1-desc">An intelligent chatbot ecosystem designed to assist students with daily homework tasks and organizational planning as well as moral support, home help and way more, in a dynamic learning environment.</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="project2.jpg" alt="Project 2: Nexo" class="project-img">
+                    <div class="project-info">
+                        <h3 data-i18n="proj2-title">Nexo assistant</h3>
+                        <p data-i18n="proj2-desc">Fully automated and portable, Physical assistant who is able to respond to your questions by simply pressing a button and pouring your heart out, no matter the question, Nexo will respond in a comforting tone</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="project3.jpg" alt="Project 3: AetherPlus" class="project-img">
+                    <div class="project-info">
+                        <h3 data-i18n="proj3-title">AetherPlus+</h3>
+                        <p data-i18n="proj3-desc">A high-end virtual Ecosystem to guide users on each an every problem, now through the new AetherPlus+ version, without the limitations and boundaries of our base models thanks to the new API Pro Bots.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa">
+            <h2 class="section-title" data-i18n="qa-title">❓ Your Questions, Answered</h2>
+            <div class="qa-container">
+                <div class="qa-item">
+                    <div class="qa-question">
+                        <span data-i18n="qa1-q">🌟 What makes your chatbots different from standard AI?</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="qa-answer" data-i18n="qa1-a">Our bots are designed with specific use-cases in mind—especially education. Instead of just handing over answers, our bots are programmed to be friendly, patient, and full of personality.</div>
+                </div>
+                <div class="qa-item">
+                    <div class="qa-question">
+                        <span data-i18n="qa2-q">🛠️ Will there be more fearures in the future?</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="qa-answer" data-i18n="qa2-a">Absolutely. Whether you need a virtual tutor tailored to a specific curriculum, or a customer support bot trained exclusively on your business's product catalog, we tailor the knowledge base, tone, and interface to match your exact needs. Contact us for your suggestions!</div>
+                </div>
+                <div class="qa-item">
+                    <div class="qa-question">
+                        <span data-i18n="qa3-q">🌍 What languages do your chatbots support?</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="qa-answer" data-i18n="qa3-a">Our base model currently only offers Albanian and English, while our Paid AetherPlus+ version is able to communicate in over 99+ languages Globaly</div>
+                </div>
+                <div class="qa-item">
+                    <div class="qa-question">
+                        <span data-i18n="qa4-q">💰 What does your pricing model look like?</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="qa-answer" data-i18n="qa4-a">We believe in accessible tech. We offer a generous free tier for individual students and casual users featuring our core learning bots. For advanced bots with custom solutions, we offer tiered monthly subscriptions based on AI models. (contact us for more info or reffer to the payment plan section).</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2 class="section-title" data-i18n="contact-title">📫 Let’s Connect</h2>
+            <div class="contact-container">
+                <p class="contact-intro" data-i18n="contact-intro">Got a brilliant project idea? Need to automate your workflow?</p>
+                <p class="contact-subtext" data-i18n="contact-subtext">Whether you're an educator looking to revolutionize your classroom or a business ready to scale up your customer support, or just a fellow student who is in need of a clean AI ecosystem as our friend, we're here to help bring your vision to life. Drop us a line, and we'll reply within 24 hours! ✨</p>
+                
+                <div class="contact-buttons">
+                    <a href="mailto:aetherlinkdevmii@gmail.com" class="contact-btn hover-info" data-info="aetherlinkdevmii@gmail.com">
+                        <span data-i18n="btn-email">📧 Email Us</span>
+                    </a>
+                    <a href="https://www.instagram.com/omiros_aetherlink" target="_blank" class="contact-btn hover-info" data-info="@omiros_aetherlink">
+                        <span data-i18n="btn-insta">📸 Instagram</span>
+                    </a>
+                    <a href="tel:+355697904179" class="contact-btn hover-info" data-info="+355 697904179">
+                        <span data-i18n="btn-phone">💬 Phone Number / Whatsapp</span>
+                    </a>
+                </div>
+                
+                <p style="margin-top: 3.5rem; font-weight: 600; color: #1f4871; font-size: 1.1rem;" data-i18n="contact-footer">📍 Based worldwide — entirely remote & ready to innovate</p>
+
+                <!-- ADDED AETHERPLUS BUTTON HERE -->
+                <div style="margin-top: 2rem; display: flex; justify-content: center;">
+                    <a href="https://omiros-aetherlink.github.io/AetherPlusWebsite" target="_blank" class="contact-btn" style="text-decoration: none;">
+                        <span>✨ Go to AetherPlus Website</span>
+                    </a>
+                </div>
+                <!-- END ADDED AETHERPLUS BUTTON -->
+
+            </div>
+        </section>
+
+        <footer>
+            <p data-i18n="site-footer">&copy; 2025 AI Chatbot Creators | Designing the future of conversation, one bot at a time 💙💙</p>
+        </footer>
+    </div>
+
+    <script>
+        // ========== TRANSLATION DICTIONARY ==========
+        const i18n = {
+            "nav-home": { en: "🏠 Home", al: "🏠 Kryefaqja" },
+            "nav-skills": { en: "⚡ Skills", al: "⚡ Aftësitë" },
+            "nav-about": { en: "👥 About Us", al: "👥 Rreth Nesh" },
+            "nav-projects": { en: "📂 Projects", al: "📂 Projektet" },
+            "nav-qa": { en: "💬 Q&A", al: "💬 Pyetje & Përgjigje" },
+            "nav-contact": { en: "📞 Contact", al: "📞 Kontakt" },
+            "hero-title": { en: "🌐AetherLink. Connected by code, driven by Aether.", al: "🌐AetherLink. Lidhur nga kodi, drejtuar nga Aether." },
+            "hero-text": { en: "Creating intelligent conversational agents that help students learn about art, literature, history & and many more with our diverse AI ecosystems. Our chatbots blend vast knowledge with genuine empathy to create a seamless learning experience.", al: "Krijimi i agjentëve bisedues inteligjentë që ndihmojnë studentët të mësojnë rreth artit, letërsisë, historisë dhe shumë më tepër me ekosistemet tona të ndryshme të AI. Robotët tanë përziejnë njohuritë e gjera me ndjeshmëri të vërtetë për të krijuar një përvojë të qetë mësimore." },
+            "hero-subtext": { en: "We believe technology should empower education, not replace human connection. Whether it’s acting as a patient tutor, a creative brainstorming partner, or a reliable automated support system for a business, we architect chatbots that understand context, tone, and intent.", al: "Ne besojmë se teknologjia duhet të fuqizojë edukimin, jo të zëvendësojë lidhjen njerëzore. Pavarësisht nëse vepron si një mësues i duruar, partner krijues ose sistem mbështetës i besueshëm për një biznes, ne arkitektojmë robotë që kuptojnë kontekstin, tonin dhe qëllimin." },
+            "hero-badge": { en: "🚀 10+ Custom Bots, 2 Seperate Ecosystems and more &nbsp;|&nbsp; 🎓 Happy Students & Users", al: "🚀 10+ Bote të personalizuara, 2 Ekosisteme të ndara e më shumë &nbsp;|&nbsp; 🎓 Studentë & Përdorues të Kënaqur" },
+            // ADDED ECOSYSTEM TRANSLATIONS HERE
+            "eco-title": { en: "🌟 Try Our Free Core Ecosystem", al: "🌟 Provo Ekosistemin Tonë Bazë Falas" },
+            "eco-text": { en: "Experience our free learning bots and discover what AetherLink can do for your educational journey today.", al: "Përjeto robotët tanë falas të mësimit dhe zbulo se çfarë mund të bëjë AetherLink për rrugëtimin tënd arsimor sot." },
+            "eco-btn": { en: "🚀 Launch AetherCore", al: "🚀 Nis AetherCore" },
+            // END ADDED TRANSLATIONS
+            "skills-title": { en: "🚀 Our Core Capabilities", al: "🚀 Aftësitë Tona Kryesore" },
+            "skill1-title": { en: "AI Development & Integration", al: "Zhvillimi & Integrimi i AI" },
+            "skill1-desc": { en: "We specialize in AI development, while building clean and seemless ecosystems, all to integrate AI into the users life as neatly as possible", al: "Ne jemi të specializuar në zhvillimin e AI, duke ndërtuar ekosisteme të pastra dhe të pandërprera, për të integruar AI në jetën e përdoruesve sa më mirë." },
+            "skill2-title": { en: "Web & Interface Design", al: "Dizajni i Uebit & Ndërfaqes" },
+            "skill2-desc": { en: "From sleek HTML/CSS frameworks to dynamic React frontends, we ensure our chatbots are wrapped in beautiful interfaces that are effortless to embed anywhere while perfectly emmiting the same nostalgic aroma everyone craves from Frutiger Aero.", al: "Nga kornizat elegante HTML/CSS te frontends dinamikë React, ne sigurojmë ndërfaqe të bukura që rrezatojnë aromën nostalgjike të Frutiger Aero." },
+            "skill3-title": { en: "Prompt Engineering", al: "Inxhinieria e Prompt-eve" },
+            "skill3-desc": { en: "It's not just about what the bot says, but how it says it. We craft prompts that ensure robust conversational memory, adaptive tone, and highly empathetic yet accurate replies.", al: "Nuk ka të bëjë vetëm me atë që thotë roboti, por se si e thotë. Ne krijojmë prompts që sigurojnë një kujtesë të fortë, ton të përshtatshëm dhe përgjigje empatike." },
+            "skill4-title": { en: "Up to date Development & Frequent Updates", al: "Zhvillim i Përditësuar & Përditësime të Shpeshta" },
+            "skill4-desc": { en: "Our team works day in and out to offer new updates and features, as well as up to date information and a clean environment, fixing issues and bugs almost instantly.", al: "Ekipi ynë punon çdo ditë për të ofruar përditësime dhe veçori të reja, si dhe mjedis të pastër, duke rregulluar problemet pothuajse menjëherë." },
+            "skill5-title": { en: "UI / UX Optimization", al: "Optimizimi i UI / UX" },
+            "skill5-desc": { en: "We prioritize accessibility and user delight, ensuring that every chat bubble, button, and interaction feels intuitive for users of all technical backgrounds.", al: "Ne i japim përparësi aksesueshmërisë, duke siguruar që çdo flluskë bisede, buton dhe ndërveprim të ndihet intuitiv për të gjithë përdoruesit." },
+            "skill6-title": { en: "Data Privacy & Safety", al: "Privatësia & Siguria e të Dhënave" },
+            "skill6-desc": { en: "Security is key. We build with ethical AI guardrails and strict data protection protocols to keep user information safe.", al: "Siguria është çelësi. Ne ndërtojmë me rregulla etike të AI dhe protokolle strikte mbrojtjeje për të mbajtur informacionet tuaja të sigurta." },
+            "about-title": { en: "👥 Meet The Creators", al: "👥 Njihuni me Krijuesit" },
+            "alex-role": { en: "Ecosystem Coder & Hardware Developer", al: "Kodues i Ekosistemit & Zhvillues Hardware" },
+            "alex-quote": { en: "\"Building AI for everyone.\"", al: "\"Ndërtimi i AI për të gjithë.\"" },
+            "alex-bio": { en: "With a deep passion for technology, Alex oversees the core architecture of our ecosystems. He ensures that every Bot we develop is not only technologically advanced but fundamentally helpful, and accsesible to anyone no mattter their abilities which he makes possible with Nexo.", al: "Me pasion të deep për teknologjinë, Alex mbikëqyr arkitekturën thelbësore të ekosistemeve. Ai siguron që çdo robot është thelbësisht i dobishëm dhe i aksesueshëm me Nexo." },
+            "marina-role": { en: "Main Bot Programer & Website developer", al: "Programuesja Kryesore & Zhvilluese e Faqes" },
+            "marina-quote": { en: "\"Code meets presicion, pixel by pixel.\"", al: "\"Kodi takon saktësinë, piksel pas pikseli.\"" },
+            "marina-bio": { en: "Marina is the visionary behind our comlex bots. Bridging the gap between complex backend logic and user-friendly design, she meticulously crafts accessible and highly responsive web environments, ensuring our chatbots functions just as brilliant as they look.", al: "Marina mbyll hendekun midis logjikës komplekse backend dhe dizajnit miqësor, duke krijuar mjedise uebi tepër të përgjegjshme dhe të aksesueshme." },
+            "spiri-role": { en: "Graphics and UI designer", al: "Dizajnere Grafike dhe UI" },
+            "spiri-quote": { en: "\"Grapics that tell a story.\"", al: "\"Grafika që tregojnë një histori.\"" },
+            "spiri-bio": { en: "Spiridhula gives our bots their spark. By implementing sleek UI elements into each and every part of our project, she ensures that our Ecosystems appeal to Teachers, Students, Buisnesses and anyone else, while also keeping our brands Aero Identity alive and the center of each of our projects.", al: "Spiridhula u jep robotëve tanë shkëndijën e tyre, duke zbatuar elemente elegante të UI për t'i bërë ekosistemet tona tërheqëse dhe duke mbajtur gjallë Identitetin tonë Aero." },
+            "pet-role": { en: "Community and Promotion manager", al: "Menaxhere e Komunitetit dhe Promovimit" },
+            "pet-quote": { en: "\"Community & engagement magic.\"", al: "\"Magjia e komunitetit dhe angazhimit.\"" },
+            "pet-bio": { en: "Products thrive when people love them, and Petrula makes sure our users are always pleased with the frequent updates she suggests. From gathering vital feedback regarding potential features to presenting our projects to judges with pure organisation and accuarcy, she makes sure our project is portrayed how it's meant to be, in its own style.", al: "Petrula sigurohet që përdoruesit tanë të jenë të kënaqur me përditësimet që ajo sugjeron, nga mbledhja e komenteve te prezantimi i projekteve me saktësi maksimale." },
+            "ili-role": { en: "Digital Outreach & Social Media Manager", al: "Menaxhere e Rrjeteve Sociale & Shtrirjes Dixhitale" },
+            "ili-quote": { en: "\"Reaching minds in up-to-date methods.\"", al: "\"Arritja e mendjeve me metoda të përditësuara.\"" },
+            "ili-bio": { en: "Iliana is the engine driving our growth. Through targeted ad campaigns and smart social media strategy, she navigates the digital landscape to connect our smart chatbot solutions with the people that need them most, while actively bringing new engagement from different platforms, ultimately scaling our reach and maximizing our brand's overall long-term presence.", al: "Iliana është motori i rritjes sonë. Përmes fushatave dhe strategjive në rrjete sociale, ajo lidh zgjidhjet tona smart me ata që kanë më shumë nevojë, duke maksimizuar prezencën tonë." },
+            "proj-title": { en: "📂 Featured Projects", al: "📂 Projektet e Veçuara" },
+            "proj1-title": { en: "AetherLink Ecosystem", al: "Ekosistemi AetherLink" },
+            "proj1-desc": { en: "An intelligent chatbot ecosystem designed to assist students with daily homework tasks and organizational planning as well as moral support, home help and way more, in a dynamic learning environment.", al: "Një ekosistem inteligjent i krijuar për të ndihmuar studentët me detyrat e shtëpisë, planifikimin, mbështetjen morale e më shumë, në një mjedis dinamik mësimi." },
+            "proj2-title": { en: "Nexo assistant", al: "Asistenti Nexo" },
+            "proj2-desc": { en: "Fully automated and portable, Physical assistant who is able to respond to your questions by simply pressing a button and pouring your heart out, no matter the question, Nexo will respond in a comforting tone, made using a raspberry Pi 3B+", al: "Asistent fizik plotësisht i automatizuar që u përgjigjet pyetjeve tuaja thjesht duke shtypur një buton. Pavarësisht pyetjes, Nexo do të përgjigjet me një ton ngushëllues, modeli i pajisjes= Raspberry Pi 3B+." },
+            "proj3-title": { en: "AetherPlus+", al: "AetherPlus+" },
+            "proj3-desc": { en: "A high-end virtual Ecosystem to guide users on each an every problem, now through the new AetherPlus+ version, without the limitations and boundaries of our base models thanks to the new API Pro Bots.", al: "Një Ekosistem virtual i nivelit të lartë pa kufizimet e modeleve tona bazë për të udhëhequr përdoruesit në çdo problem, falë robotëve të rinj API Pro." },
+            "qa-title": { en: "❓ Your Questions, Answered", al: "❓ Pyetjet Tuaja, Të Përgjigjura" },
+            "qa1-q": { en: "🌟 What makes your chatbots different from standard AI?", al: "🌟 Çfarë i bën robotët tuaj të ndryshëm nga AI standarde?" },
+            "qa1-a": { en: "Our bots are designed with specific use-cases in mind—especially education. Instead of just handing over answers, our bots are programmed to be friendly, patient, and full of personality.", al: "Robotët tanë janë të programuar me raste të veçanta përdorimi në mendje—veçanërisht edukimin. Ato janë miqësore, të durueshme dhe plot personalitet." },
+            "qa2-q": { en: "🛠️ Can you build a fully custom chatbot for my specific business?", al: "🛠️ A do të shtoni Chatbota/Ekosisteme të tjera." },
+            "qa2-a": { en: "Absolutely. Whether you need a virtual tutor tailored to a specific curriculum, or a customer support bot trained exclusively on your business's product catalog, we tailor the knowledge base, tone, and interface to match your exact needs. Contact us for a consultation!", al: "Absolutisht. Pavarësisht nëse keni nevojë për një mësues virtual apo mbështetje klienti, ne konsiderojmë përshtatim bazën e njohurive dhe tonin sipas sygjerimeve tuaja." },
+            "qa3-q": { en: "🌍 What languages do your chatbots support?", al: "🌍 Çfarë gjuhësh mbështesin robotët tuaj?" },
+            "qa3-a": { en: "Our base model currently only offers Albanian and English, while our Paid AetherPlus+ version is able to communicate in over 99+ languages Globaly", al: "Modeli ynë bazë ofron vetëm shqip dhe anglisht, ndërsa versioni AetherPlus+ mund të komunikojë në mbi 99+ gjuhë Globalisht." },
+            "qa4-q": { en: "💰 What does your pricing model look like?", al: "💰 Si duket modeli juaj i çmimeve?" },
+            "qa4-a": { en: "We believe in accessible tech. We offer a generous free tier for individual students and casual users featuring our core learning bots. For advanced bots with custom solutions, we offer tiered monthly subscriptions based on AI models and custom feature requirements. No hidden fees, ever. If you need a bot to be made specifically for your project we also have different pricing plans! (contact us for more info or reffer to the payment plan section).", al: "Ne ofrojmë një nivel bujar falas për studentët. Për robotët e avancuar ofrojmë abonime mujore pa tarifa të fshehura. Na kontaktoni për plane të dedikuara çmimesh!" },
+            "contact-title": { en: "📫 Let’s Connect", al: "📫 Le të Lidhemi" },
+            "contact-intro": { en: "Got a brilliant project idea? Need to automate your workflow?", al: "Keni një ide brilante për projekt? Duhet të automatizoni punën tuaj?" },
+            "contact-subtext": { en: "Whether you're an educator looking to revolutionize your classroom or a business ready to scale up your customer support, or just a fellow student who is in need of a clean AI ecosystem as our friend, we're here to help bring your vision to life. Drop us a line, and we'll reply within 24 hours! ✨", al: "Pavarësisht nëse jeni mësues, biznes, apo thjesht një student, ne jemi këtu për t'ju ndihmuar. Na dërgoni mesazh dhe do të përgjigjemi brenda 24 orëve! ✨" },
+            "btn-email": { en: "📧 Email Us", al: "📧 Na Dërgoni Email" },
+            "btn-insta": { en: "📸 Instagram", al: "📸 Instagram" },
+            "btn-phone": { en: "💬 Phone Number / Whatsapp", al: "💬 Numri i Telefonit / Whatsapp" },
+            "contact-footer": { en: "📍 Based worldwide — entirely remote & ready to innovate", al: "📍 Bazuar në mbarë botën — tërësisht në distancë & gati për inovacion" },
+            "site-footer": { en: "&copy; 2025 AI Chatbot Creators | Designing the future of conversation, one bot at a time 💙💙", al: "&copy; 2025 Krijuesit e AI Chatbot | Dizajnojmë të ardhmen e bisedës, një robot në të njëjtën kohë 💙💙" }
+        };
+
+        // ========== TOGGLE LOGIC ==========
+        let isAl = false;
+        const toggleBtn = document.getElementById('langToggle');
+
+        toggleBtn.addEventListener('click', () => {
+            isAl = !isAl;
+            const currentLang = isAl ? 'al' : 'en';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[key]) {
+                    // if it is the badge or footer, use innerHTML to keep the html entities/tags active
+                    if (key === 'hero-badge' || key === 'site-footer') {
+                        el.innerHTML = i18n[key][currentLang];
+                    } else {
+                        // check if we are currently hovered over an info button
+                        const parentBtn = el.closest('.hover-info');
+                        if (parentBtn && parentBtn.matches(':hover')) {
+                            // do nothing, let the hover text remain active
+                        } else {
+                            el.innerText = i18n[key][currentLang];
+                        }
+                    }
+                }
+            });
+            updateActiveNav();
+        });
+
+        // ========== CONTACT BUTTONS HOVER SWAP ==========
+        document.querySelectorAll('.hover-info').forEach(btn => {
+            const span = btn.querySelector('span');
+            const originalInfo = btn.getAttribute('data-info');
+            
+            btn.addEventListener('mouseenter', () => {
+                span.innerText = originalInfo;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                const key = span.getAttribute('data-i18n');
+                span.innerText = i18n[key][isAl ? 'al' : 'en'];
+            });
+        });
+
+        // ========== SMOOTH SCROLL FUNCTION ==========
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // ========== Q&A ACCORDION ==========
+        const qaItems = document.querySelectorAll('.qa-item');
+        qaItems.forEach(item => {
+            const questionDiv = item.querySelector('.qa-question');
+            const arrowSpan = questionDiv.querySelector('span:last-child');
+            
+            questionDiv.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                if (!isActive) {
+                    item.classList.add('active');
+                    if (arrowSpan) arrowSpan.innerHTML = '▲';
+                } else {
+                    item.classList.remove('active');
+                    if (arrowSpan) arrowSpan.innerHTML = '▼';
+                }
+            });
+            if (item.classList.contains('active')) {
+                if (arrowSpan) arrowSpan.innerHTML = '▲';
+            } else {
+                if (arrowSpan) arrowSpan.innerHTML = '▼';
+            }
+        });
+        
+        // ========== ACTIVE NAV HIGHLIGHT ==========
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        
+        function updateActiveNav() {
+            let current = '';
+            const scrollY = window.scrollY + 140;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.style.background = 'transparent';
+                link.style.color = '#1f4871';
+                // Check against i18n keys for active state mapping
+                const key = link.getAttribute('data-i18n');
+                if ((current === 'home' && key === 'nav-home') ||
+                    (current === 'skills' && key === 'nav-skills') ||
+                    (current === 'about' && key === 'nav-about') ||
+                    (current === 'projects' && key === 'nav-projects') ||
+                    (current === 'qa' && key === 'nav-qa') ||
+                    (current === 'contact' && key === 'nav-contact')) {
+                    link.style.color = '#0a3757';
+                    link.style.background = '#dae5f4';
+                    link.style.fontWeight = '800';
+                } else {
+                    link.style.fontWeight = '700';
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+        
+        // ========== CREATE FLOATING DOTS ==========
+        function generateDots() {
+            const dotContainer = document.getElementById('dotBg');
+            if (!dotContainer) return;
+            const dotCount = 70;
+            for (let i = 0; i < dotCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                const size = Math.floor(Math.random() * 20) + 6; 
+                dot.style.width = `${size}px`;
+                dot.style.height = `${size}px`;
+                dot.style.left = `${Math.random() * 100}%`;
+                dot.style.top = `${Math.random() * 100}%`;
+                dot.style.animationDuration = `${Math.random() * 5 + 3}s`; 
+                dot.style.animationDelay = `${Math.random() * 5}s`;
+                dot.style.opacity = Math.random() * 0.5 + 0.2;
+                dot.style.background = `rgba(70, 120, 190, ${Math.random() * 0.4 + 0.2})`;
+                dotContainer.appendChild(dot);
+            }
+        }
+        
+        generateDots();
+    </script>
+</body>
+</html>
